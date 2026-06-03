@@ -29,6 +29,7 @@ fun Steper() {
     val dao = db.expenseDao()
     val scope = rememberCoroutineScope()
     var step by remember { mutableStateOf(1) }
+    var isLoggedIn by remember { mutableStateOf(false) }
     var expenses by remember { mutableStateOf(listOf<Expense>()) }
     var editingExpense by remember { mutableStateOf<Expense?>(null) }
     var totalAmount by remember { mutableStateOf(0.0) }
@@ -56,7 +57,9 @@ fun Steper() {
         }
     }
 
-    when(step) {
+    if (!isLoggedIn) {
+        LoginPage(onLoginSuccess = { isLoggedIn = true })
+    } else when(step) {
         1 -> {
             MainPage(
                 expenses = expenses,
