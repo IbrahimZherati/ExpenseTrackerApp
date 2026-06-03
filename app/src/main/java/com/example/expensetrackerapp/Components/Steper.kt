@@ -1,24 +1,16 @@
 package com.example.expensetrackerapp.Components
 
 import android.content.Intent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import com.example.expensetrackerapp.data.AppDatabase
 import com.example.expensetrackerapp.data.Expense
@@ -36,11 +28,11 @@ fun Steper() {
     val db = remember { AppDatabase.getInstance(context) }
     val dao = db.expenseDao()
     val scope = rememberCoroutineScope()
-    var step by remember { mutableStateOf(1) }
+    var step by remember { mutableIntStateOf(1) }
     var isLoggedIn by remember { mutableStateOf(false) }
     var expenses by remember { mutableStateOf(listOf<Expense>()) }
     var editingExpense by remember { mutableStateOf<Expense?>(null) }
-    var totalAmount by remember { mutableStateOf(0.0) }
+    var totalAmount by remember { mutableDoubleStateOf(0.0) }
 
     // Load expenses from database
     LaunchedEffect(Unit) {
