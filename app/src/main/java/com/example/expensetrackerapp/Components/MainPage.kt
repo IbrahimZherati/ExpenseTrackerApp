@@ -28,6 +28,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.example.expensetrackerapp.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -66,7 +68,7 @@ fun MainPage(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Expense Tracker",
+                    text = stringResource(R.string.app_name),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
