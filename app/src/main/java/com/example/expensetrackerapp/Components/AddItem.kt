@@ -9,18 +9,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +32,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.expensetrackerapp.data.Expense
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddItem(
     onSave: (Expense) -> Unit = {},
@@ -44,6 +49,11 @@ fun AddItem(
 
     val categories = listOf("Food", "Transport", "Shopping", "Entertainment", "Bills", "Other")
     var expanded by remember { mutableStateOf(false) }
+
+    val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
+    val todayLocal = System.currentTimeMillis() + TimeZone.getDefault().getOffset(System.currentTimeMillis())
+    var selectedDateMillis by remember { mutableStateOf(todayLocal) }
+    var showDatePicker by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -106,19 +116,55 @@ fun AddItem(
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Date picker
+        OutlinedButton(
+            onClick = { showDatePicker = true },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Date: ${dateFormat.format(Date(selectedDateMillis))}")
+        }
+
+        if (showDatePicker) {
+            val datePickerState = rememberDatePickerState(
+                initialSelectedDateMillis = selectedDateMillis,
+                selectableDates = object : androidx.compose.material3.SelectableDates {
+                    override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                        return utcTimeMillis <= System.currentTimeMillis() + 86400000
+                    }
+                }
+            )
+            DatePickerDialog(
+                onDismissRequest = { showDatePicker = false },
+                confirmButton = {
+                    TextButton(onClick = {
+                        datePickerState.selectedDateMillis?.let {
+                            selectedDateMillis = it + TimeZone.getDefault().getOffset(it)
+                        }
+                        showDatePicker = false
+                    }) { Text("OK") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDatePicker = false }) { Text("Cancel") }
+                }
+            ) {
+                DatePicker(state = datePickerState)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Button(
             onClick = {
-                // ✅ FIXED: Use 'description' instead of 'text'
                 if (description.isNotBlank() && amount.isNotBlank() && category.isNotBlank()) {
                     val amountValue = amount.toDoubleOrNull() ?: 0.0
                     onSave(
                         Expense(
-                            description = description,  // ✅ Fixed here
+                            description = description,
                             amount = amountValue,
                             category = category,
-                            date = System.currentTimeMillis()
+                            date = selectedDateMillis
                         )
                     )
                 }
