@@ -125,40 +125,40 @@ fun MainPage(
                 }
             }
 
-            // Expense list
-            if (expenses.isEmpty()) {
-                Box(
-                    modifier = Modifier.weight(1f).fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "No expenses yet.\nTap + to add one",
-                        textAlign = TextAlign.Center,
-                        color = Color.Gray
-                    )
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.weight(1f).fillMaxWidth(),
-                    contentPadding = PaddingValues(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(expenses) { expense ->
-                        ExpenseItem(
-                            expense = expense,
-                            onEdit = { onEditClick(expense) },
-                            onDelete = { onDeleteClick(expense) }
+            // Expense list with floating FAB overlay
+            Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                if (expenses.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "No expenses yet.\nTap + to add one",
+                            textAlign = TextAlign.Center,
+                            color = Color.Gray
                         )
                     }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(expenses) { expense ->
+                            ExpenseItem(
+                                expense = expense,
+                                onEdit = { onEditClick(expense) },
+                                onDelete = { onDeleteClick(expense) }
+                            )
+                        }
+                    }
                 }
-            }
 
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp, end = 8.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
                 FloatingActionButton(
                     onClick = onAddClick,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(end = 8.dp, bottom = 8.dp),
                     containerColor = MaterialTheme.colorScheme.primary
                 ) {
                     Icon(Icons.Default.Add, contentDescription = "Add Expense")
