@@ -15,8 +15,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -37,7 +39,8 @@ fun MainPage(
     totalAmount: Double,
     onAddClick: () -> Unit,
     onEditClick: (Expense) -> Unit,
-    onDeleteClick: (Expense) -> Unit
+    onDeleteClick: (Expense) -> Unit,
+    onExportClick: () -> Unit = {}
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         // Top Bar with total
@@ -59,7 +62,16 @@ fun MainPage(
                     fontWeight = FontWeight.Bold
                 )
 
-                // Total badge
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = onExportClick) {
+                        Icon(
+                            Icons.Default.Share,
+                            contentDescription = "Export CSV",
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+
+                    // Total badge
                 Surface(
                     shape = CircleShape,
                     color = MaterialTheme.colorScheme.primary,
@@ -80,6 +92,7 @@ fun MainPage(
                             color = Color.White,
                             fontWeight = FontWeight.Bold
                         )
+                    }
                     }
                 }
             }
