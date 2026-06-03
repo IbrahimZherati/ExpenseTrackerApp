@@ -70,11 +70,17 @@ fun MainPage(
                     fontWeight = FontWeight.Bold
                 )
 
-                IconButton(onClick = onExportClick) {
+                // export to csv
+                IconButton(
+                    onClick = { if (expenses.isNotEmpty()) onExportClick() }
+                ) {
                     Icon(
                         Icons.Default.Share,
                         contentDescription = "Export CSV",
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        tint = if (expenses.isEmpty())
+                            MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.38f)
+                        else
+                            MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 }
             }
