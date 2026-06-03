@@ -42,6 +42,7 @@ fun MainPage(
     totalAmount: Double,
     selectedMonth: Int,
     selectedYear: Int,
+    isNextMonthEnabled: Boolean = true,
     onPreviousMonth: () -> Unit,
     onNextMonth: () -> Unit,
     onAddClick: () -> Unit,
@@ -107,11 +108,17 @@ fun MainPage(
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                IconButton(onClick = onNextMonth) {
+                IconButton(
+                    onClick = { if (isNextMonthEnabled) onNextMonth() }
+                ) {
                     Icon(
                         Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         contentDescription = "Next Month",
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(32.dp),
+                        tint = if (isNextMonthEnabled)
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        else
+                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
                     )
                 }
             }

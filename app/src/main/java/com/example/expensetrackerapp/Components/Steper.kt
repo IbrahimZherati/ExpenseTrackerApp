@@ -89,6 +89,8 @@ fun Steper() {
         LoginPage(onLoginSuccess = { isLoggedIn = true })
     } else when(step) {
             1 -> {
+            val now = Calendar.getInstance()
+            val isAtCurrentMonth = selectedYear == now.get(Calendar.YEAR) && selectedMonth == now.get(Calendar.MONTH) + 1
             MainPage(
                 expenses = expenses,
                 totalAmount = totalAmount,
@@ -102,12 +104,15 @@ fun Steper() {
                         selectedMonth -= 1
                     }
                 },
+                isNextMonthEnabled = !isAtCurrentMonth,
                 onNextMonth = {
-                    if (selectedMonth == 12) {
-                        selectedMonth = 1
-                        selectedYear += 1
-                    } else {
-                        selectedMonth += 1
+                    if (!isAtCurrentMonth) {
+                        if (selectedMonth == 12) {
+                            selectedMonth = 1
+                            selectedYear += 1
+                        } else {
+                            selectedMonth += 1
+                        }
                     }
                 },
                 onAddClick = { step = 2 },
