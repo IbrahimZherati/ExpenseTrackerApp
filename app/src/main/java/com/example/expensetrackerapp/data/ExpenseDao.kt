@@ -15,6 +15,9 @@ interface ExpenseDao {
     @Query("SELECT * FROM expenses ORDER BY timestamp DESC")
      fun getAllExpenses(): Flow<List<Expense>>
 
+    @Query("SELECT * FROM expenses WHERE date >= :startOfMonth AND date < :startOfNextMonth ORDER BY date DESC")
+    fun getExpensesForMonth(startOfMonth: Long, startOfNextMonth: Long): Flow<List<Expense>>
+
     @Query("SELECT SUM(amount) FROM expenses")
     suspend fun getTotalAmount() : Double
 

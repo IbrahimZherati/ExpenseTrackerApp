@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -34,27 +35,33 @@ fun Steper() {
     var editingExpense by remember { mutableStateOf<Expense?>(null) }
     var totalAmount by remember { mutableDoubleStateOf(0.0) }
 
-    // Load expenses from database
-    LaunchedEffect(Unit) {
+    val calendar = remember { Calendar.getInstance() }
+    var selectedYear by remember { mutableIntStateOf(calendar.get(Calendar.YEAR)) }
+    var selectedMonth by remember { mutableIntStateOf(calendar.get(Calendar.MONTH) + 1) }
+
+    fun getMonthBoundaries(year: Int, month: Int): Pair<Long, Long> {
+        val cal = Calendar.getInstance()
+        cal.set(year, month - 1, 1, 0, 0, 0)
+        cal.set(Calendar.MILLISECOND, 0)
+        val startOfMonth = cal.timeInMillis
+        cal.add(Calendar.MONTH, 1)
+        val startOfNextMonth = cal.timeInMillis
+        return Pair(startOfMonth, startOfNextMonth)
+    }
+
+    // Load expenses from database filtered by selected month
+    LaunchedEffect(selectedYear, selectedMonth) {
+        val (start, end) = getMonthBoundaries(selectedYear, selectedMonth)
         scope.launch {
-            dao.getAllExpenses().collect { expenseList ->
+            dao.getExpensesForMonth(start, end).collect { expenseList ->
                 expenses = expenseList
+                totalAmount = expenseList.sumOf { it.amount }
             }
         }
     }
 
-    // Load total amount
-    LaunchedEffect(Unit) {
-        scope.launch {
-            totalAmount = dao.getTotalAmount()
-        }
-    }
-
-    // Refresh total after add/update/delete
     fun refreshTotal() {
-        scope.launch {
-            totalAmount = dao.getTotalAmount()
-        }
+        totalAmount = expenses.sumOf { it.amount }
     }
 
     suspend fun exportToCsv(context: android.content.Context, expenses: List<Expense>) {
@@ -85,6 +92,24 @@ fun Steper() {
             MainPage(
                 expenses = expenses,
                 totalAmount = totalAmount,
+                selectedMonth = selectedMonth,
+                selectedYear = selectedYear,
+                onPreviousMonth = {
+                    if (selectedMonth == 1) {
+                        selectedMonth = 12
+                        selectedYear -= 1
+                    } else {
+                        selectedMonth -= 1
+                    }
+                },
+                onNextMonth = {
+                    if (selectedMonth == 12) {
+                        selectedMonth = 1
+                        selectedYear += 1
+                    } else {
+                        selectedMonth += 1
+                    }
+                },
                 onAddClick = { step = 2 },
                 onExportClick = {
                     scope.launch {
@@ -98,7 +123,7 @@ fun Steper() {
                 onDeleteClick = { expense ->
                     scope.launch {
                         dao.deleteExpense(expense)
-                        refreshTotal()  // ✅ Refresh total after delete
+                        refreshTotal()
                     }
                 }
             )
